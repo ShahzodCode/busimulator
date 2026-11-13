@@ -1,0 +1,255 @@
+{
+  "say.waiting": [
+    "Avtobus qayerda?!",
+    "Ishga kechikyapman!",
+    "Yana besh daqiqa kutaman...",
+    "Oyogʻim toldi...",
+    "Qachon keladi bu avtobus?",
+    "Bozorga shoshyapman!"
+  ],
+  "say.waiting.maktab": [
+    "Darsga kech qolaman!",
+    "Ustoz urishadi-ku!"
+  ],
+  "say.waiting.chorsu": [
+    "Non sovib qoladi!",
+    "Bozor yopilib qoladi!"
+  ],
+  "say.waiting.metro": [
+    "Metrodan keldim, endi bu...",
+    "Poyezd tez edi, avtobus sekin!"
+  ],
+  "say.angry": [
+    "Bir soatdan beri kutyapman!",
+    "Bu qanaqa xizmat?!",
+    "Ertaga mashina olaman!",
+    "Bas, piyoda ketaman!",
+    "Hokimiyatga shikoyat qilaman!"
+  ],
+  "say.full": [
+    "Yana toʻla!",
+    "Eshikka ham sigʻmadim!",
+    "Keyingisini kutamiz endi...",
+    "Siqilib ketdim-ku!"
+  ],
+  "say.happy": [
+    "Zoʻr, tez keldi!",
+    "Rahmat, haydovchi aka!",
+    "Vaqtida keldi!",
+    "Joy bor ekan!",
+    "Mana bu xizmat!"
+  ],
+  "say.taxi": [
+    "Taksiga chiqaman, boʻldi!",
+    "Pulim ketsa ham, taksi!",
+    "Endi hech qachon avtobus kutmayman!"
+  ],
+  "hud.sound": "Ovoz",
+  "game.title": "Toshkent Avtobus",
+  "hud.speed": "Tezlik",
+  "hud.pause": "Pauza",
+  "hud.day": "{n}-kun",
+  "hud.happiness": "Kayfiyat",
+  "hud.money": "soʻm",
+  "hud.waiting": "{n} kutmoqda",
+  "hud.rush": "Tigʻiz soat!",
+  "float.taxi": "Taksi!",
+  "float.full": "Joy yoʻq!",
+  "float.newBus": "Yangi avtobus!",
+  "float.sold": "Sotildi",
+  "fleet.buy": "Sotib olish",
+  "fleet.sell": "Sotish",
+  "fleet.interval": "Interval",
+  "fleet.min": "daq",
+  "fleet.noMoney": "Pul yetarli emas",
+  "fleet.max": "Maksimum",
+  "fleet.dailyCost": "kuniga −{c} + yoqilgʻi",
+  "day.title": "{n}-kun yakunlandi!",
+  "day.served": "Tashilgan yoʻlovchilar",
+  "day.gaveUp": "Taksiga ketganlar",
+  "day.avgWait": "Oʻrtacha kutish",
+  "day.happiness": "Kayfiyat",
+  "day.revenue": "Daromad",
+  "day.costs": "Doimiy xarajat ({n} avtobus × {c})",
+  "day.profit": "Sof foyda",
+  "day.riders": "Ertaga yoʻlovchilar",
+  "day.next": "Keyingi kun",
+  "tip.title": "Bilasizmi?",
+  "tip.headway": "Odamlar oʻrtacha avtobuslar orasidagi intervalning yarmicha kutishadi. Bugun interval ~{h} daq edi, shuning uchun kutish ~{w} daq boʻldi. Yana bitta avtobus intervalni qisqartiradi!",
+  "tip.bunching": "Avtobuslaringiz bir-biriga yopishib qolyapti! Oldingi avtobus koʻp yoʻlovchi oladi va sekinlashadi, orqadagisi esa uni quvib yetadi. Bu butun dunyoda “bus bunching” deb ataladi. Terminal shuni tuzatadi: oldingisiga yaqinlashib qolgan avtobus u yerda biroz kutib, oraliqni tekislaydi.",
+  "tip.costs": "Har bir avtobus uchun haydovchi maoshi va texnik xizmat doimiy xarajat. Dizel esa bosib oʻtilgan masofa va yoʻlovchilar ogʻirligiga qarab sarflanadi.",
+  "tip.happy": "Xizmat yaxshi boʻlsa, odamlar doʻstlariga aytadi va avtobusga koʻproq odam chiqadi. Yaxshi xizmat — koʻproq yoʻlovchi va koʻproq daromad!",
+  "stop.chorsu": "Chorsu",
+  "stop.metro": "Metro",
+  "stop.maktab": "Maktab",
+  "stop.mahalla": "Mahalla",
+  "say.waiting.vokzal": [
+    "Poyezdga kechikaman!",
+    "Chiptam kuyib ketadi-ku!"
+  ],
+  "say.waiting.universitet": [
+    "Maʼruzaga kech qoldim!",
+    "Domla kiritmaydi endi!"
+  ],
+  "say.waiting.markaz": [
+    "Majlis boshlanib qoldi!",
+    "Boshliq nima deydi endi..."
+  ],
+  "say.waiting.bog": [
+    "Muzqaymogʻim erib ketdi...",
+    "Bolalar charchab qoldi!"
+  ],
+  "say.waiting.yunusobod": [
+    "Yunusoboddan markazga yetib boʻlmaydi!"
+  ],
+  "say.waiting.chilonzor": [
+    "Butun Chilonzor shu bekatda turibdi!"
+  ],
+  "say.waiting.p.worker": [
+    "Ishga kechikyapman!",
+    "Boshliq jahl qiladi!",
+    "Yana oylikdan ushlab qolishadi..."
+  ],
+  "say.waiting.p.student": [
+    "Juftlikka ulgurmayman!",
+    "Yana “nb” qoʻyishadi!"
+  ],
+  "say.waiting.p.pupil": [
+    "Qoʻngʻiroq chalinib qoladi!",
+    "Ustoz urishadi-ku!"
+  ],
+  "say.waiting.p.shopper": [
+    "Sumkalarim ogʻir...",
+    "Bozor yopilib qoladi!"
+  ],
+  "say.waiting.p.elder": [
+    "Oyogʻim ogʻriyapti, bolam...",
+    "Bizning davrda avtobus vaqtida kelardi!"
+  ],
+  "say.waiting.p.visitor": [
+    "Chamadonim bilan qayoqqa boraman?",
+    "Mehmonxonaga qanday yetaman?"
+  ],
+  "say.skip": [
+    "Tiqilinch ekan, keyingisini kutaman.",
+    "Bunaqa tiqilinchga chiqmayman!"
+  ],
+  "say.skip.p.elder": [
+    "Oʻtiradigan joy yoʻq-ku, bolam...",
+    "Tik turib ketolmayman."
+  ],
+  "say.skip.p.visitor": [
+    "Chamadonim sigʻmaydi!"
+  ],
+  "say.skip.p.shopper": [
+    "Sumkalarim bilan sigʻmayman!"
+  ],
+  "tip.tidal": "Ertalab hamma uydan ishga va oʻqishga boradi, kechqurun esa uyga qaytadi — yoʻlovchilar “toʻlqini” bir tomonga oqadi. Shuning uchun tigʻiz soatda avtobuslar turar joy bekatlaridayoq toʻlib qoladi. Bugun {n} kishi toʻla avtobusga sigʻmadi — tigʻiz soatga koʻproq avtobus kerak!",
+  "tip.traffic": "Tigʻiz soatda koʻchalar tirband boʻladi va avtobuslar sekinlashadi. Toshkentda Navoiy koʻchasidagi avtobus yoʻlagi kengaytirilgach, avtobuslar tezligi 18 dan 22 km/soatga oshdi. Alohida avtobus yoʻlagi — tirbandlikka qarshi eng yaxshi dori!",
+  "tip.people": "Yoʻlovchilar har xil: ishchilar va oʻquvchilar shoshadi va uzoq kutmaydi, keksalar sabrli, lekin tiqilinch avtobusga chiqmaydi. Bozor, metro va markaz kabi mashhur joylarda kun boʻyi koʻp odam tushadi va chiqadi.",
+  "stop.yunusobod": "Yunusobod",
+  "stop.bog": "Milliy bogʻ",
+  "stop.universitet": "Universitet",
+  "stop.chilonzor": "Chilonzor",
+  "stop.vokzal": "Vokzal",
+  "stop.markaz": "Amir Temur xiyoboni",
+  "hud.play": "Davom etish",
+  "menu.lines": "Yoʻnalishlar",
+  "menu.gaps": "Oraliqlar",
+  "menu.book": "Qoʻllanma",
+  "menu.settings": "Sozlamalar",
+  "menu.close": "Yopish",
+  "lines.ring": "Halqa yoʻnalishi",
+  "lines.meta": "{s} bekat · {b} avtobus",
+  "lines.interval": "Interval ~{m} daq",
+  "lines.buses": "avtobus",
+  "lines.add": "Avtobus qoʻshish",
+  "lines.remove": "Bitta avtobusni sotish",
+  "lines.new": "Yangi yoʻnalish",
+  "lines.soon": "Tez orada: oʻz yoʻnalishingizni chizing",
+  "lines.worst": "Eng uzun oraliq: {m} daq",
+  "gaps.good": "{a} daq gacha",
+  "gaps.ok": "{a}–{b} daq",
+  "gaps.bad": "{b} daq dan koʻp",
+  "gaps.tag": "{m} daq",
+  "settings.sound": "Ovoz",
+  "settings.soundHint": "Signal, eshik va tanga tovushlari",
+  "book.locked": "Qoʻllanma 3-kunda ochiladi",
+  "book.unlocked": "Qoʻllanma ochildi!",
+  "book.title": "Dispetcher daftari",
+  "book.subtitle": "Toshkent avtobus",
+  "book.open": "Varaqlash uchun bosing",
+  "book.next": "Keyingi sahifa",
+  "book.prev": "Oldingi sahifa",
+  "book.p1.title": "Interval",
+  "book.p1.text": "Ikki avtobus orasidagi vaqt interval deyiladi. Yoʻlovchi oʻrtacha intervalning yarmicha kutadi: interval 20 daqiqa boʻlsa, kutish 10 daqiqa atrofida.",
+  "book.p1.note": "“Oraliqlar” tugmasi buni yoʻlning oʻzida koʻrsatadi.",
+  "book.p2.title": "Tigʻiz soat",
+  "book.p2.text": "Ertalab 7 dan 9 gacha hamma uydan ishga va oʻqishga boradi, 15 dan 18 gacha esa uyga qaytadi. Avtobuslar turar joy bekatlaridayoq toʻlib qoladi, yoʻllar ham tirband boʻladi.",
+  "book.p2.note": "Tigʻiz soatga oldindan tayyorlaning.",
+  "book.p3.title": "Yoʻlovchilar",
+  "book.p3.text": "Hamma bir xil emas. Ishchilar va oʻquvchilar shoshadi va uzoq kutmaydi. Keksalar sabrli, lekin tiqilinch avtobusga chiqmaydi. Mehmonlar chamadon bilan sekin chiqadi.",
+  "book.p3.note": "Bozor, metro va markazda kun boʻyi odam koʻp.",
+  "book.p4.title": "Davomi bor",
+  "book.p4.text": "Bu daftar hali yupqa. Oʻyin oʻsgani sari yangi sahifalar qoʻshiladi: yangi yoʻnalishlar, jadval va avtobus yoʻlaklari haqida.",
+  "book.p4.note": "",
+  "loading": "Yuklanmoqda...",
+  "day.fuel": "Yoqilgʻi sarfi",
+  "tip.fuel": "Avtobus yoʻlovchisiz boʻlsa ham yoqilgʻi sarflaydi: dvigatel ishlaydi, bekatlarda kutadi va yoʻnalish boʻylab yuradi. Koʻproq yoʻlovchi esa sarfni oshiradi.",
+  "lines.east": "Sharqiy halqa",
+  "stop.teleminora": "Teleminora",
+  "stop.minor": "Minor masjidi",
+  "stop.hazratimom": "Hazrati Imom",
+  "stop.navoiy": "Navoiy teatri",
+  "stop.mustaqillik": "Mustaqillik maydoni",
+  "stop.sergeli": "Sergeli",
+  "stop.humo": "Humo Arena",
+  "stop.tashkentcity": "Tashkent City",
+  "stop.olmazor": "Olmazor",
+  "say.waiting.teleminora": [
+    "Teleminoradan butun shaharni koʻrmoqchiman!",
+    "Mehmonlarga Teleminorani koʻrsataman!"
+  ],
+  "say.waiting.minor": [
+    "Juma namoziga ulgurishim kerak!"
+  ],
+  "say.waiting.hazratimom": [
+    "Namozga kechikib qolaman!",
+    "Qurʼonni koʻrgani keldim!"
+  ],
+  "say.waiting.navoiy": [
+    "Spektakl boshlanib qoladi!",
+    "Chiptam bor, oʻzim yoʻq!"
+  ],
+  "say.waiting.mustaqillik": [
+    "Vazirlikka hujjat topshirishim kerak!"
+  ],
+  "say.waiting.sergeli": [
+    "Sergelidan shaharga chiqish qiyin-da!"
+  ],
+  "say.waiting.humo": [
+    "Xokkey boshlanib qoldi!",
+    "Konsertga kechikyapman!"
+  ],
+  "say.waiting.tashkentcity": [
+    "Ofisda majlis bor!",
+    "Tashkent City'da ishlayman, kechikdim!"
+  ],
+  "say.waiting.olmazor": [
+    "Olmazordan chiqib boʻlmayapti!"
+  ],
+  "lines.open": "Yoʻnalishni ochish",
+  "lines.openSub": "1 ta avtobus bilan",
+  "lines.opened": "{name} ochildi!",
+  "lines.lockedHint": "Yangi yoʻnalish bitta avtobus bilan ochiladi: interval ~{m} daq boʻladi. Qoʻshimcha avtobuslar uchun ham pul yigʻing!",
+  "tip.newLine": "Yangi yoʻnalishga odamlar darhol oʻrganib qolmaydi: yoʻlovchilar har kuni koʻpayib boradi. Lekin bitta avtobus juda kam — interval uzun boʻlsa, odamlar kutib charchab, taksiga ketadi. Yangi yoʻnalishga ham avtobus qoʻshing!",
+  "stop.terminal": "Terminal",
+  "float.held": "⏱ +{m} daq · oraliq tekislandi",
+  "say.waiting.terminal": [
+    "Avtobus turibdi-yu, nega ketmayapti?",
+    "Haydovchi choy ichyaptimi?"
+  ],
+  "book.p5.title": "Terminal",
+  "book.p5.text": "Ikkala yoʻnalish kesishgan joyda terminal bor. Har bir avtobus u yerda biroz koʻproq turadi. Agar oldingi avtobus endigina ketgan boʻlsa-yu, orqadagisi hali uzoqda boʻlsa, avtobus ikkalasining oʻrtasiga tushguncha kutadi. Shunda oraliqlar teng boʻladi va hech kim 30 daqiqa kutib qolmaydi.",
+  "book.p5.note": "Bir avtobusni ozgina ushlab turish, hammani kutishdan qutqaradi."
+}
