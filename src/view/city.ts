@@ -188,13 +188,19 @@ function metro(): THREE.Group {
 
 /** Bus stop shelter (Blender model: curved canopy, glass, bench, advert box, route sign) with a name board in the line's colour. */
 function busStop(name: string, color: string): THREE.Group {
-  const g = prop('BusStop');
-  // sprite: always faces the camera so names stay readable on every side of the loop
+  const g = stopBoard(name, color, 3.4);
+  g.add(prop('BusStop'));
+  return g;
+}
+
+/** A stop's name board in the line's colour, `y` metres up (a sprite, so it always faces the camera). */
+function stopBoard(name: string, color: string, y: number): THREE.Group {
+  const g = new THREE.Group();
   const tex = textTexture(name, '#ffffff', color, 96);
   const board = new THREE.Sprite(new THREE.SpriteMaterial({ map: tex, transparent: true }));
   const img = tex.image as HTMLCanvasElement;
   board.scale.set((1.0 * img.width) / img.height, 1.0, 1);
-  board.position.set(0, 3.4, 0.2);
+  board.position.set(0, y, 0.2);
   board.renderOrder = 10;
   g.add(board);
   g.userData.board = board;
@@ -227,52 +233,17 @@ function textTexture(text: string, fg: string, bg: string, size: number): THREE.
 }
 
 /**
- * Bus terminal hall: a long glass-fronted waiting hall under a turquoise roof, a deep canopy
- * on columns over the forecourt, and a tower carrying the terminal's name. Front is +z.
+ * Bus terminal (Blender model "Terminal": island platform, glass waiting hall, see-through half-round roof on four pipes,
+ * departure boards, clock tower, painted bus stands on both bays) with its name above the tower.
+ * Centred on the island, which runs along x; the clock tower stands at its west end.
  */
 function terminalHall(name: string): THREE.Group {
-  const g = new THREE.Group();
-  g.add(rbox(13, 3.2, 7, C.cream, 0.3));
-  const glass = rbox(10.6, 2, 0.2, C.window, 0.08);
-  glass.position.set(-0.6, 0.5, 3.5);
-  g.add(glass);
-  for (const x of [-4.2, -1.6, 1, 3.6]) {
-    const mullion = rbox(0.18, 2, 0.26, C.windowFrame, 0.06);
-    mullion.position.set(x, 0.5, 3.52);
-    g.add(mullion);
-  }
-  const roof = rbox(13.8, 0.45, 7.8, C.turquoise, 0.15);
-  roof.position.y = 3.2;
-  g.add(roof);
-  // the forecourt canopy where passengers wait for their bus
-  const canopy = rbox(13.4, 0.3, 5.2, C.turquoiseDeep, 0.12);
-  canopy.position.set(0, 2.9, 6.1);
-  g.add(canopy);
-  for (const x of [-6, -2, 2, 6]) {
-    const col = mesh(new THREE.CylinderGeometry(0.16, 0.16, 2.9, 8), C.windowFrame);
-    col.position.set(x, 1.45, 8.2);
-    g.add(col);
-  }
-  for (const x of [-4, 0, 4]) {
-    const bench = rbox(2, 0.45, 0.6, C.wood, 0.1);
-    bench.position.set(x, 0, 5.4);
-    g.add(bench);
-  }
-  const tower = rbox(1.8, 7.5, 1.8, C.turquoiseDeep, 0.2);
-  tower.position.set(5.4, 0, 2.6);
-  g.add(tower);
-  const clock = mesh(new THREE.CylinderGeometry(0.62, 0.62, 0.12, 20), C.windowFrame, false);
-  clock.rotation.x = Math.PI / 2;
-  clock.position.set(5.4, 6.4, 3.52);
-  g.add(clock);
-  const hand = rbox(0.08, 0.45, 0.06, C.road, 0.02);
-  hand.position.set(5.4, 6.4, 3.6);
-  g.add(hand);
+  const g = prop('Terminal');
   const sign = textTexture(name, '#ffffff', '#1f9fb8', 96);
   const board = new THREE.Sprite(new THREE.SpriteMaterial({ map: sign, transparent: true }));
   const img = sign.image as HTMLCanvasElement;
-  board.scale.set((1.5 * img.width) / img.height, 1.5, 1);
-  board.position.set(5.4, 8.7, 2.6);
+  board.scale.set((1.6 * img.width) / img.height, 1.6, 1);
+  board.position.set(-10.6, 12.4, 0);
   board.renderOrder = 10;
   g.add(board);
   return g;
@@ -998,7 +969,8 @@ export function buildCity(lines: LineDef[], terminal?: TerminalDef): CityBuild {
     const route = line.route;
     const s = route.sample(st.d);
     const p = Route.right(s, ROAD_HALF + 1.4);
-    const obj = busStop(st.name, line.color);
+    // the terminal island has its own platforms, so only the line's name board stands there
+    const obj = st.terminal ? stopBoard(st.name, line.color, 5.3) : busStop(st.name, line.color);
     // shelter's open side (+z) faces the road
     place(city, obj, p.x, p.z, face(p.x, p.z, s.x, s.z));
     obj.userData.key = st.key;
@@ -1018,19 +990,11 @@ export function buildCity(lines: LineDef[], terminal?: TerminalDef): CityBuild {
     if (st.kind === 'park' || st.kind === 'center' || st.kind === 'metro' || st.kind === 'sight') greens.push({ x: c.x, z: c.z, r: lm.r + 13 });
   }
 
-  // --- bus terminal: a paved plaza filling the corner by the crossing, the hall on it ---
+  // --- bus terminal: the island between the two bays (the model brings its own paving) ---
   if (terminal) {
-    // the plaza runs from the hall to the pavements of both roads (the hall's +z faces line 1's road)
-    const x0 = terminal.x - 8;
-    const x1 = Math.min(terminal.x + 9.4, cx + W / 2);
-    const z0 = terminal.z - 8;
-    const z1 = terminal.z + 15.4;
-    const plaza = mesh(new THREE.BoxGeometry(x1 - x0, 0.02, z1 - z0), C.sidewalk, false);
-    plaza.position.set((x0 + x1) / 2, 0.015, (z0 + z1) / 2);
-    city.add(plaza);
     place(city, baked(terminalHall(terminal.name)), terminal.x, terminal.z);
-    taken.push({ x: terminal.x, z: terminal.z + 1.2, r: 9.5 });
-    taken.push({ x: terminal.x + 2, z: terminal.z + 10, r: 7 });
+    // keep street trees and blocks off the island
+    for (let x = -12; x <= 12; x += 4) taken.push({ x: terminal.x + x, z: terminal.z, r: 4.6 });
   }
 
   // --- central park inside line 1's ring (west of the line 2 avenue that cuts through it) ---

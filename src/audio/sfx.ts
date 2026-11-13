@@ -1,7 +1,7 @@
 /**
  * Procedural sound effects with the Web Audio API — no audio files, no downloads, no licences.
  * Every sound is a few oscillators or a noise burst shaped by an envelope.
- * Each sound type is throttled so 4x speed doesn't turn into noise.
+ * Each sound type is throttled so 16x speed doesn't turn into noise.
  */
 
 const STORAGE_KEY = 'bus-sim-muted';

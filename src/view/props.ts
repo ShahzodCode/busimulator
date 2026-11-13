@@ -8,6 +8,20 @@ import { C, mat } from './palette';
  */
 const templates = new Map<string, THREE.Object3D>();
 
+/**
+ * The terminal's roof shell ("roofGlass" in build_props.py): white-ish and very see-through,
+ * so the crowd under it and the far bay stay visible. It casts no shadow.
+ */
+const ROOF_GLASS = new THREE.MeshStandardMaterial({
+  color: 0xf4faff,
+  roughness: 0.2,
+  metalness: 0,
+  transparent: true,
+  opacity: 0.18,
+  depthWrite: false,
+  side: THREE.DoubleSide,
+});
+
 export async function loadProps(url: string): Promise<void> {
   const gltf = await new GLTFLoader().loadAsync(url);
   for (const root of [...gltf.scene.children]) {
@@ -17,10 +31,11 @@ export async function loadProps(url: string): Promise<void> {
       if (!m.isMesh) return;
       // share the city's cached matte materials, so the baked city merges them into one draw call each
       const src = m.material as THREE.MeshStandardMaterial;
+      const glass = src.name === 'roofGlass';
       const named = (C as Record<string, number>)[src.name];
-      m.material = mat(named ?? src.color.getHex());
+      m.material = glass ? ROOF_GLASS : mat(named ?? src.color.getHex());
       src.dispose();
-      m.castShadow = true;
+      m.castShadow = !glass;
       m.receiveShadow = true;
     });
     templates.set(root.name, root);

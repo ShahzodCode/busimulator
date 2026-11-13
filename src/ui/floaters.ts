@@ -12,7 +12,7 @@ interface Tag {
   get: () => THREE.Vector3;
 }
 
-/** DOM labels pinned to 3D points: short-lived pop-ups ("+2 000") and persistent tags (bus load). */
+/** DOM labels pinned to 3D points: short-lived pop-ups ("+2 500") and persistent tags (bus load). */
 export class Floaters {
   private readonly layer: HTMLElement;
   private readonly live: Floater[] = [];

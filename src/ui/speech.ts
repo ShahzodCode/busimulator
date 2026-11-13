@@ -9,7 +9,7 @@ const MAX_BUBBLES = 3;
 /**
  * Decides who says what, and when. Passengers react to their situation in short,
  * funny Uzbek lines — each one hints at the real problem (waits, crowding, cars).
- * Rate-limited in real time so the screen never turns into a wall of text, even at 4x.
+ * Rate-limited in real time so the screen never turns into a wall of text, even at 16x.
  */
 export class Speech {
   private chatterIn = 3;

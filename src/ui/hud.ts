@@ -10,7 +10,7 @@ export function formatMoney(n: number): string {
   return n < 0 ? `−${s}` : s;
 }
 
-const SPEEDS = [1, 2, 4, 8];
+const SPEEDS = [1, 2, 8, 16];
 const press: Keyframe[] = [{ transform: 'scale(0.86)' }, { transform: 'scale(1.08)' }, { transform: 'scale(1)' }];
 
 /**

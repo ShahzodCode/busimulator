@@ -41,8 +41,10 @@ export interface StopState {
   kind: PlaceKind;
   /** how big / popular the place is */
   size: number;
-  /** a platform at the bus terminal, where buses are held to even out the gaps */
+  /** a platform at the bus terminal */
   terminal: boolean;
+  /** a timing point (the terminal, or a line's own station), where buses are held to even out the gaps */
+  hold: boolean;
   queue: Passenger[];
 }
 
@@ -157,7 +159,7 @@ export interface BusGap {
   level: GapLevel;
 }
 
-export const FARE = 2000; // so'm, Tashkent city bus fare
+export const FARE = 2500; // so'm, Tashkent city bus fare (raised from 2 000 to 2 500 so'm, the current price)
 export const BUS_PRICE = 25_000_000;
 export const SELL_REFUND = 0.5;
 /** Fixed driver wages and maintenance per bus/day; fuel is charged by actual use. */
@@ -234,7 +236,7 @@ export class World {
     const size0 = specs[0].stops.reduce((n, s) => n + s.size, 0);
     this.lines = specs.map((spec, index) => {
       const stops = spec.stops.map((s) => {
-        this.stops.push({ key: s.key, d: s.d, kind: s.kind, size: s.size, terminal: !!s.terminal, line: index, route: spec.route, queue: [] });
+        this.stops.push({ key: s.key, d: s.d, kind: s.kind, size: s.size, terminal: !!s.terminal, hold: !!(s.terminal || s.hold), line: index, route: spec.route, queue: [] });
         return this.stops.length - 1;
       });
       const size = spec.stops.reduce((n, s) => n + s.size, 0);
@@ -606,7 +608,7 @@ export class World {
         continue;
       }
       // 3) at the terminal, wait for this bus's slot; people arriving meanwhile still get on
-      if (s.terminal && !bus.retiring && !this.slotReady(bus, w.since)) {
+      if (s.hold && !bus.retiring && !this.slotReady(bus, w.since)) {
         bus.holding = true;
         w.timer += TERMINAL_POLL;
         break;
@@ -623,7 +625,7 @@ export class World {
           this.events.skipped?.(bus, w.stop, s.queue);
         }
       }
-      if (s.terminal && !bus.retiring) {
+      if (s.hold && !bus.retiring) {
         this.lines[bus.line].terminalDepart = this.time;
         this.events.released?.(bus, w.stop, Math.max(0, this.time - w.since - TERMINAL_LAYOVER));
       }

@@ -223,7 +223,7 @@ async function start(): Promise<void> {
     const realDt = Math.min(0.05, (now - last) / 1000);
     last = now;
 
-    // sim: sub-step so 8x stays stable; frozen while the day card is up
+    // sim: sub-step so 16x stays stable; frozen while the day card is up
     if (!clock.dayOver) {
       const simDt = realDt * clock.speed;
       const steps = Math.max(1, Math.ceil(simDt / 0.02));

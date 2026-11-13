@@ -94,7 +94,7 @@ export class PeopleView {
     const slot = this.slot(stop, this.world.stops[stop].queue.length - 1);
     // walk in from further out on the sidewalk
     const s = this.world.stops[stop].route.sample(this.world.stops[stop].d);
-    const from = Route.right(s, ROAD_HALF + 7);
+    const from = Route.right(s, this.world.stops[stop].terminal ? ROAD_HALF + 3.8 : ROAD_HALF + 7);
     this.walkers.set(p.id, {
       id: p.id,
       x: from.x + (Math.random() - 0.5) * 4,
@@ -123,8 +123,10 @@ export class PeopleView {
     const bus = this.busViews.get(busId);
     if (!bus) return;
     const door = bus.doorWorld();
-    const s = this.world.stops[stop].route.sample(this.world.stops[stop].d + (Math.random() - 0.3) * 6);
-    const away = Route.right(s, ROAD_HALF + 9 + Math.random() * 3);
+    const st = this.world.stops[stop];
+    const s = st.route.sample(st.d + (Math.random() - 0.3) * 6);
+    // at the terminal they head into the waiting hall in the middle of the island, not across the other bay
+    const away = Route.right(s, st.terminal ? ROAD_HALF + 3.4 + Math.random() * 0.6 : ROAD_HALF + 9 + Math.random() * 3);
     this.walkers.set(p.id, {
       id: p.id,
       x: door.x,
@@ -144,8 +146,9 @@ export class PeopleView {
   giveUp(p: Passenger, stop: number): void {
     const w = this.walkers.get(p.id);
     if (!w) return;
-    const s = this.world.stops[stop].route.sample(this.world.stops[stop].d - 6 - Math.random() * 6);
-    const away = Route.right(s, ROAD_HALF + 10);
+    const st = this.world.stops[stop];
+    const s = st.route.sample(st.d - 6 - Math.random() * 6);
+    const away = Route.right(s, st.terminal ? ROAD_HALF + 3.6 : ROAD_HALF + 10);
     w.phase = 'leaving';
     w.mood = 'gone';
     w.tx = away.x;

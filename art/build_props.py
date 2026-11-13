@@ -1,8 +1,10 @@
 """
-Builds the city props (bus stop shelter + tree species) and exports them for the game.
+Builds the city props (bus stop shelter, tree species, bus terminal) and exports them for the game.
 
 Run headless:
   blender -b --factory-startup --python art/build_props.py
+or inside an open Blender (e.g. sent through the Blender MCP add-on): it then builds into its
+own "Props" scene, leaves the user's file alone and skips saving art/props.blend.
 Outputs:
   art/props.blend            (editable source, assets laid out in a row)
   public/models/props.glb    (what the game loads; one root node per asset)
@@ -12,7 +14,8 @@ Conventions
   * Each asset is an Empty named after the asset ("BusStop", "Tree_chinor", ...)
     with one mesh child per material. The game swaps materials for its shared
     palette materials by colour, so keep the colour count small.
-  * Budget: trees stay under ~600 triangles, the shelter under ~1500.
+  * Budget: trees stay under ~600 triangles, the shelter under ~1500, the terminal under ~9000
+    (it is baked into the static city, so it costs no extra draw calls).
 """
 
 import math
@@ -60,6 +63,11 @@ PAL = {
     "acacia": 0x8FCF4F,
     "apricot": 0xFFA53D,
     "blossom": 0xFFB7C9,
+    # terminal
+    "sidewalk": 0xF3E6C9,
+    "board": 0x2B3442,  # dark departure-board face
+    "steel": 0xDFE5EC,  # pale steel pipes holding up the terminal roof
+    "roofGlass": 0xF4FAFF,  # see-through roof shell; src/view/props.ts swaps it for a transparent material
 }
 
 
@@ -470,9 +478,200 @@ def bush(rng):
     return A
 
 
+# ---------------------------------------------------------------- bus terminal
+# Island platform between two drive-through bays (see TERMINAL_HALL in src/sim/layout.ts).
+# Origin = island centre. +X = east. Line 1's bay runs along -Y (game south, buses drive -X),
+# line 2's along +Y (game north, buses drive +X). Both bay roads are centred 7 m from the origin.
+T_LEN = 26.0  # island length (m)
+T_HALF_W = 3.8  # island half width: kerb to kerb is 7.6 m
+T_BAY = 7.0  # road centre of each bay
+T_LANE = 1.6  # bus centre sits this far from its road centre, towards the island
+T_STOPS = {-1: (-6.0, 1), 1: (8.0, -1)}  # side: (stop x, direction behind the stop along X); match terminalOn() in layout.ts
+
+
+def arch_band(y0, y1, z0, rise, thick, n=10):
+    """Polygon (YZ) of an arched beam from y0 to y1 springing at z0 and rising `rise` at the crown."""
+    top = []
+    for i in range(n + 1):
+        t = i / n
+        top.append((y0 + (y1 - y0) * t, z0 + math.sin(t * math.pi) * rise))
+    return top + [(y, z - thick) for y, z in reversed(top)]
+
+
+def half_shell(x0, x1, r, z0, n=18):
+    """Open half-cylinder (semicircle across Y) from x0 to x1, springing at height z0. One sheet, no ends."""
+    bm = bmesh.new()
+    rows = []
+    for i in range(n + 1):
+        a = math.pi * i / n
+        y, z = -r * math.cos(a), z0 + r * math.sin(a)
+        rows.append((bm.verts.new((x0, y, z)), bm.verts.new((x1, y, z))))
+    for (a0, a1), (b0, b1) in zip(rows, rows[1:]):
+        bm.faces.new((a0, a1, b1, b0))
+    for f in bm.faces:
+        f.normal_update()
+        if f.normal.z < 0:
+            f.normal_flip()
+    return bm
+
+
+def bay_box(A, x, y, w=5.4, d=2.9, line=0.12):
+    """Painted bay outline on the road where a bus stands (yellow, like real bus stands)."""
+    z = 0.075
+    for sy in (-1, 1):
+        A.add(box(w, line, 0.01, (x, y + sy * d / 2, z)), "gold")
+    for sx in (-1, 1):
+        A.add(box(line, d, 0.01, (x + sx * w / 2, y, z)), "gold")
+
+
+def terminal():
+    A = Asset("Terminal")
+    L, H = T_LEN, T_HALF_W
+    x0, x1 = -L / 2, L / 2
+
+    # --- island: raised platform, paving, tactile strips along both kerbs
+    A.add(box(L, H * 2, 0.22, (0, 0, 0.11), bevel=0.06), "curb")
+    A.add(box(L - 0.5, H * 2 - 0.5, 0.02, (0, 0, 0.23)), "sidewalk")
+    for sy in (-1, 1):
+        A.add(box(L - 1.2, 0.3, 0.02, (0, sy * (H - 0.45), 0.245)), "gold")
+
+    # --- waiting hall: glass box on a cream plinth with a turquoise roof and a tiled frieze
+    hx, hy, hh = 5.6, 1.45, 2.9
+    A.add(box(hx * 2, hy * 2, 0.3, (0, 0, 0.38), bevel=0.05), "cream")
+    for sy in (-1, 1):
+        A.add(box(hx * 2 - 0.2, 0.06, hh - 0.5, (0, sy * hy, 0.53 + (hh - 0.5) / 2)), "window")
+        for i in range(9):
+            x = -hx + 0.1 + i * (hx * 2 - 0.2) / 8
+            A.add(box(0.12, 0.12, hh - 0.5, (x, sy * hy, 0.53 + (hh - 0.5) / 2)), "white")
+        # sliding doors facing each bay: a frame and a gold header
+        A.add(box(1.8, 0.1, 0.12, (0, sy * (hy + 0.04), 2.25)), "gold")
+        A.add(box(0.06, 0.08, 1.7, (0, sy * (hy + 0.05), 1.4)), "frame")
+    for sx in (-1, 1):
+        A.add(box(0.06, hy * 2 - 0.2, hh - 0.5, (sx * hx, 0, 0.53 + (hh - 0.5) / 2)), "window")
+    A.add(box(hx * 2 + 0.4, hy * 2 + 0.4, 0.4, (0, 0, hh + 0.2), bevel=0.08), "cream")
+    for sy in (-1, 1):
+        A.add(box(hx * 2 + 0.42, 0.04, 0.24, (0, sy * (hy + 0.21), hh + 0.2)), "turquoise")
+        for i in range(12):  # little girih diamonds on the tile band
+            d = box(0.16, 0.03, 0.16, (-hx + 0.45 + i * (hx * 2 - 0.9) / 11, sy * (hy + 0.235), hh + 0.2), rot=Matrix.Rotation(math.pi / 4, 4, "Y"))
+            A.add(d, "gold")
+    A.add(box(hx * 2 + 0.8, hy * 2 + 0.8, 0.18, (0, 0, hh + 0.49), bevel=0.06), "turquoiseDeep")
+    # ticket and info kiosk at the east end of the hall
+    A.add(box(1.7, 1.6, 2.3, (hx + 1.6, 0, 0.23 + 1.15), bevel=0.12), "turquoise")
+    A.add(box(1.0, 0.04, 0.6, (hx + 1.6, -0.8, 1.55)), "window")
+    A.add(box(1.0, 0.04, 0.6, (hx + 1.6, 0.8, 1.55)), "window")
+    A.add(box(1.9, 1.8, 0.14, (hx + 1.6, 0, 2.6), bevel=0.05), "white")
+
+    # --- roof: a see-through half-cylinder shell over the island, held up by four steel pipes.
+    # It is drawn transparent in the game (props.ts), so the crowd and the far bay stay visible.
+    span = H - 0.45  # roof radius: the shell's edges sit right above the pipes
+    rx0, rx1 = -8.8, 9.6  # clear of the clock tower (west) and the lamp posts at both ends
+    spring = 3.4  # height of the pipes, where the half circle starts
+    A.add(half_shell(rx0, rx1, span, spring), "roofGlass")
+    for x in (rx0 + 0.4, rx1 - 0.4):
+        for sy in (-1, 1):
+            A.add(cyl(0.12, 0.12, spring - 0.23, 10, (x, sy * span, 0.23)), "steel", smooth=True)
+            A.add(cyl(0.22, 0.22, 0.1, 10, (x, sy * span, 0.23)), "steel")
+    # thin rails along both edges carry the shell from pipe to pipe
+    for sy in (-1, 1):
+        A.add(cyl(0.07, 0.07, rx1 - rx0, 8, (rx0, sy * span, spring), Matrix.Rotation(math.pi / 2, 4, "Y")), "steel", smooth=True)
+
+    # --- departure boards hanging from the roof, one facing each bay
+    for side, (sx, _) in T_STOPS.items():
+        bx = sx + 2.0 * (1 if side < 0 else -1)
+        y = side * (span - 0.4)
+        top = spring + math.sqrt(span ** 2 - y ** 2)  # roof height above the board
+        A.add(box(2.0, 0.12, 0.62, (bx, y, 3.05), bevel=0.03), "board")
+        A.add(box(1.7, 0.02, 0.1, (bx, y + side * 0.07, 3.2)), "gold")
+        A.add(box(1.3, 0.02, 0.08, (bx - 0.2, y + side * 0.07, 3.02)), "lightbox")
+        A.add(box(1.5, 0.02, 0.08, (bx - 0.1, y + side * 0.07, 2.88)), "lightbox")
+        for dx in (-0.8, 0.8):
+            A.add(box(0.04, 0.04, top - 3.3, (bx + dx, y, (top + 3.3) / 2)), "steel")
+
+    # --- benches back-to-back with the hall, bins, planters with shrubs, lamp posts
+    for sy in (-1, 1):
+        for x in (-8.2, 8.0 + 2.6):
+            y = sy * (hy + 0.9)
+            for k in (0.0, 0.16, 0.32):
+                A.add(box(2.2, 0.14, 0.05, (x, y + sy * (k - 0.16), 0.68), bevel=0.015), "wood")
+            A.add(box(2.2, 0.04, 0.14, (x, y - sy * 0.27, 0.9), bevel=0.012), "wood")
+            for dx in (-0.85, 0.85):
+                A.add(box(0.08, 0.42, 0.45, (x + dx, y, 0.45)), "frame")
+        for x in (-10.4, 8.6):  # clear of both queues, which line up behind each stop
+            A.add(cyl(0.17, 0.2, 0.55, 10, (x, sy * (hy + 0.5), 0.23)), "turquoiseDeep", smooth=True)
+            A.add(cyl(0.215, 0.2, 0.06, 10, (x, sy * (hy + 0.5), 0.78)), "frame", smooth=True)
+    rng = random.Random(23)
+    for px in (x0 + 0.4, x1 - 0.6):
+        A.add(cyl(1.5, 1.6, 0.5, 14, (px, 0, 0.22)), "cream", smooth=True)
+        A.add(cyl(1.4, 1.4, 0.06, 14, (px, 0, 0.68)), "trunk")
+        leafy(A, rng, [
+            ((px, 0, 1.05), 0.65, (1.1, 1.1, 0.85)),
+            ((px + 0.7, 0.4, 0.95), 0.45),
+            ((px - 0.6, -0.5, 0.95), 0.48),
+            ((px + 0.2, -0.75, 0.9), 0.4),
+            ((px - 0.3, 0.7, 0.92), 0.42),
+        ], ["leafDeep", "leaf"])
+    for x in (x0 + 2.4, x1 - 2.4):
+        for sy in (-1, 1):
+            y = sy * (H - 0.35)
+            A.add(cyl(0.07, 0.06, 3.9, 8, (x, y, 0.23)), "frame", smooth=True)
+            A.add(limb((x, y, 4.05), (x, y - sy * 0.6, 4.15), 0.05, 0.04), "frame")
+            A.add(box(0.42, 0.24, 0.1, (x, y - sy * 0.65, 4.1), bevel=0.03), "frame")
+            A.add(box(0.34, 0.18, 0.03, (x, y - sy * 0.65, 4.04)), "lightbox")
+
+    # --- clock tower at the west end, Tashkent style: a tiled shaft and a ribbed blue dome
+    tx = x0 + 2.4
+    A.add(box(2.0, 2.0, 0.5, (tx, 0, 0.48), bevel=0.06), "cream")
+    A.add(box(1.5, 1.5, 6.6, (tx, 0, 0.73 + 3.3), bevel=0.1), "cream")
+    for z in (2.2, 4.2):
+        A.add(box(1.56, 1.56, 0.22, (tx, 0, z)), "turquoise")
+    A.add(box(1.8, 1.8, 1.5, (tx, 0, 7.33 + 0.75), bevel=0.12), "turquoiseDeep")
+    for a in range(4):  # clock faces on all four sides
+        rot = Matrix.Rotation(a * math.pi / 2, 4, "Z")
+        face = cyl(0.55, 0.55, 0.06, 20, (0, 0, 0), Matrix.Rotation(math.pi / 2, 4, "X"))
+        A.add(_place(face, rot @ Vector((0, -0.93, 8.1)) + Vector((tx, 0, 0)), rot), "white")
+        ring = cyl(0.62, 0.62, 0.04, 20, (0, 0, 0), Matrix.Rotation(math.pi / 2, 4, "X"))
+        A.add(_place(ring, rot @ Vector((0, -0.91, 8.1)) + Vector((tx, 0, 0)), rot), "gold")
+        for hand, (w, h, ang) in enumerate(((0.06, 0.4, 0.6), (0.05, 0.3, -1.9))):
+            hb = box(w, 0.02, h, (0, 0, h / 2 - 0.04), rot=Matrix.Rotation(ang, 4, "Y"))
+            A.add(_place(hb, rot @ Vector((0, -0.97 - hand * 0.01, 8.1)) + Vector((tx, 0, 0)), rot), "board")
+    A.add(box(2.0, 2.0, 0.16, (tx, 0, 8.9), bevel=0.05), "white")
+    A.add(_place(lathe([(0.85, 9.0), (0.95, 9.35), (0.85, 9.8), (0.55, 10.2), (0.22, 10.45), (0.0, 10.55)], segs=12), (tx, 0, 0)), "turquoise", smooth=True)
+    A.add(cyl(0.05, 0.03, 0.7, 6, (tx, 0, 10.5)), "gold")
+    A.add(puff((tx, 0, 11.25), 0.11, sub=1, jitter=0.0), "gold")
+
+    # --- painted bus stands on both bay roads: the stop itself and room for buses queueing behind it
+    for side, (sx, back) in T_STOPS.items():
+        y = side * (T_BAY - T_LANE)
+        for k in range(3):
+            bay_box(A, sx + back * k * 6.5, y)
+        # "BUS" chevrons pointing the way in
+        for k in range(2):
+            cx = sx - back * (4.2 + k * 0.9)
+            for s in (-1, 1):
+                A.add(box(0.7, 0.14, 0.01, (cx + back * 0.22, y + s * 0.25, 0.075), rot=Matrix.Rotation(s * back * 0.7, 4, "Z")), "white")
+    return A
+
+
 # ---------------------------------------------------------------- scene + export
+LIVE = not bpy.app.background
+
+
 def reset():
-    bpy.ops.wm.read_factory_settings(use_empty=True)
+    if not LIVE:
+        bpy.ops.wm.read_factory_settings(use_empty=True)
+        return
+    # running inside an open Blender (e.g. through the Blender MCP add-on): never wipe the
+    # user's file; rebuild a dedicated "Props" scene instead
+    old = bpy.data.scenes.get("Props")
+    if old:
+        for ob in list(old.collection.all_objects):
+            bpy.data.objects.remove(ob, do_unlink=True)
+        bpy.data.scenes.remove(old)
+    for coll in (bpy.data.meshes, bpy.data.materials, bpy.data.cameras):
+        for block in list(coll):
+            if block.users == 0:
+                coll.remove(block)
+    bpy.context.window.scene = bpy.data.scenes.new("Props")
 
 
 def preview_setup(extent):
@@ -511,13 +710,14 @@ def preview_setup(extent):
 def main():
     reset()
     rng = random.Random(11)
-    builders = [bus_stop, tree_chinor, tree_terak, tree_sarv, tree_qayragoch, tree_tut, tree_archa, tree_majnuntol, tree_orik, tree_akatsiya, tree_olcha, bush]
+    builders = [bus_stop, tree_chinor, tree_terak, tree_sarv, tree_qayragoch, tree_tut, tree_archa, tree_majnuntol, tree_orik, tree_akatsiya, tree_olcha, bush, terminal]
+    widths = {bus_stop: 6.0, terminal: 34.0}
     x = 0.0
     report = {}
     for b in builders:
-        a = b(rng) if b is not bus_stop else b()
-        width = 6.0 if b is bus_stop else 3.4
-        root, tris = a.build((x, 0, 0))
+        a = b() if b in (bus_stop, terminal) else b(rng)
+        width = widths.get(b, 3.4)
+        root, tris = a.build((x + (width / 2 - 1.7 if b is terminal else 0), 0, 0))
         report[a.name] = tris
         x += width
     for k, v in report.items():
@@ -535,12 +735,14 @@ def main():
         export_animations=False,
         export_cameras=False,
         export_lights=False,
+        use_active_scene=True,
     )
     print("[props] wrote", GLB_OUT, os.path.getsize(GLB_OUT), "bytes")
 
     ground = preview_setup(x + 2)
-    bpy.ops.wm.save_as_mainfile(filepath=BLEND_OUT)
-    print("[props] wrote", BLEND_OUT)
+    if not LIVE:
+        bpy.ops.wm.save_as_mainfile(filepath=BLEND_OUT)
+        print("[props] wrote", BLEND_OUT)
     preview = os.environ.get("PROPS_PREVIEW")
     if preview:
         bpy.context.scene.render.filepath = preview

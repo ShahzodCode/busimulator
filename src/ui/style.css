@@ -35,6 +35,8 @@ body {
 #hud {
   position: fixed;
   inset: 0;
+  /* above the world's floating labels, so open menus are never covered by them */
+  z-index: 2;
   pointer-events: none;
   padding: max(12px, env(safe-area-inset-top)) max(12px, env(safe-area-inset-right)) 12px max(12px, env(safe-area-inset-left));
 }
@@ -158,6 +160,8 @@ body {
 .floaters {
   position: fixed;
   inset: 0;
+  /* pop-ups, tags and speech belong to the world: they sit under the HUD and every sheet */
+  z-index: 1;
   pointer-events: none;
   overflow: hidden;
 }
@@ -483,6 +487,7 @@ body {
 #loading {
   position: fixed;
   inset: 0;
+  z-index: 3;
   display: grid;
   place-items: center;
   font-size: 28px;
